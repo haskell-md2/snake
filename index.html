@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <title>Змейка</title>
+    <style>
+        body{
+            background: rgb(174,230,238);
+            background: radial-gradient(circle, rgba(174,230,238,1) 0%, rgba(147,193,247,1) 67%);
+        }
+        canvas { 
+            border: 1px solid black; 
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+
+
+    </style>
+</head>
+<body>
+
+
+
+    <canvas id="cav" width="750" height="750">
+        Твой браузер говно!
+    </canvas>
+
+    <input type="button" value="Start" id="start" onclick="StartGame()">
+
+    <script>
+
+
+        function StartGame(){
+
+            $("#start").remove();
+            
+            var audio = new Audio('406869f961.mp3');
+            audio.play();
+        
+
+            var canvas = document.getElementById('cav');
+            var ctx = canvas.getContext('2d');
+
+            var game_play = true;
+
+            var parts = [];
+            var foods = null;
+
+            darwGird();
+            generate_food();
+
+            parts.push([1,0,'l']);
+
+            
+
+            function sayHi() {
+
+                if(game_play){
+                    return_to_zone();
+                    move();
+                    die();
+                    eat(parts[0][0], parts[0][1])
+                }else{
+
+                }
+                
+            }
+
+            setInterval(sayHi, 100);
+
+        
+
+        document.addEventListener("keydown",function(e){
+           
+            //up 87
+            //left 68
+            //down 83
+            //right 65
+            var key = e.keyCode;
+            if(key == 87 && parts[0][2] != 'd'){
+                //up
+                parts[0][2] = 'u';
+                //move();
+            }
+
+            if(key == 68 && parts[0][2] != 'r'){
+                //left
+                parts[0][2] = 'l';
+               // move();
+            }
+
+            if(key == 83 && parts[0][2] != 'u'){
+                //down
+                parts[0][2] = 'd';
+               // move();
+            }
+            
+            if(key == 65 && parts[0][2] != 'l'){
+                //right
+                parts[0][2] = 'r';
+               // move();
+            }
+
+            
+        });
+
+
+
+        function return_to_zone(){
+            if(parts[0][0] < 0) parts[0][0] = 30;
+            if(parts[0][0] > 30) parts[0][0] = 0;
+
+            if(parts[0][1] > 30) parts[0][1] = 0;
+            if(parts[0][1] < 0) parts[0][1] = 30;
+        }
+
+        function die(){
+
+            parts.forEach(function callback(element, index) {
+                if(index != 0 && index != 1){
+                    console.log(index,  parts.length)
+                    console.log(element[0]," = ", parts[0][0], element[1] ,"==", parts[0][1]);
+                    if(element[0] == parts[0][0] && element[1] == parts[0][1]){
+                        //https://psv4.userapi.com/c618229//u286409502/audiomsg/d3/bbf26436fd.mp3
+
+                        audio.pause();
+                        audio.currentTime = 0;
+
+                        var audio_death = new Audio('https://psv4.userapi.com/c618229//u286409502/audiomsg/d3/bbf26436fd.mp3');
+
+                        audio_death.play();
+                        game_play = false;
+
+                        ctx.clearRect(0, 0, 750, 750);
+
+                        var background = new Image();
+                        // background.src = "uyuktf.png'";
+                        // ctx.drawImage(background,0,0);   
+
+                        $("canvas").css("background-image", "url('uyuktf.png')");
+
+                        //location.reload();
+                        return;
+                    }
+                }
+
+            });
+
+
+
+        }
+
+        function eat(x,y){
+            if(fromCords(x, y)[0] == foods[0] && fromCords(x, y)[1] == foods[1]){
+                generate_food();
+                parts.push([1,60,'l']);
+            } 
+        }
+    
+        function draw_food(){
+            ctx.beginPath();
+            ctx.fillStyle = 'orange';
+            ctx.rect(foods[0],foods[1],25,25);
+            ctx.fill();
+            ctx.fillStyle = 'black';
+    
+        }
+
+        function generate_food(){
+            ctx.beginPath();
+            var x = randomInteger(0, 29);
+            var y = randomInteger(0, 29);
+
+            var cords = fromCords(x, y);
+            ctx.fillStyle = 'orange';
+            ctx.rect(cords[0],cords[1],25,25);
+            //ctx.fill();
+            ctx.fillStyle = 'black';
+
+            foods = [cords[0],cords[1]];
+            
+        }
+
+        function move(){
+
+            ctx.clearRect(0, 0, 750, 750);
+            draw_food();
+            ctx.fillStyle = 'black';
+            darwGird();
+            
+
+            var last = parts;
+            var i = 0;
+
+            var new_cor = [];
+            parts.forEach(element => {
+            
+                if(i == 0){
+
+                    if(element[2] == 'l'){
+                        element[0] += 1; 
+                    }   
+                    if(element[2] == 'd'){
+                        element[1] += 1; 
+                    } 
+                    if(element[2] == 'u'){
+                        element[1] -= 1; 
+                    } 
+                    if(element[2] == 'r'){
+                        element[0] -= 1; 
+                    }
+                    
+                }else{
+                    element = parts[i - 1];                  
+                }
+                darwSnake(element[0], element[1]); 
+                new_cor.push([element[0], element[1], element[2]]);
+                i+=1;
+            }); 
+
+            parts = new_cor;
+        }
+
+        function fromCords(x,y){
+            var res = []
+            res.push(x*25, y*25);
+            return res;
+        }
+
+        function darwSnake(x, y){
+            ctx.beginPath();
+            var cords = fromCords(x,y);
+            ctx.rect(cords[0],cords[1],25,25);
+            ctx.fill();
+        }
+
+
+        function darwGird(){
+
+            //draw horizontal
+            for(var i = 0; i < 750; i+=25){
+                ctx.beginPath();       // Начинает новый путь
+                ctx.moveTo(i, 0);    // Рередвигает перо в точку 
+                ctx.lineTo(i, 750);  // Рисует линию до точки 
+                ctx.stroke(); 
+            }
+
+            //draw vertical
+            for(var i = 0; i < 750; i+=25){
+                ctx.beginPath();       // Начинает новый путь
+                ctx.moveTo(0, i);    // Рередвигает перо в точку 
+                ctx.lineTo(750, i);  // Рисует линию до точки 
+                ctx.stroke(); 
+            }
+        }
+
+
+        function randomInteger(min, max) {
+            // получить случайное число от (min-0.5) до (max+0.5)
+            let rand = min - 0.5 + Math.random() * (max - min + 1);
+            return Math.round(rand);
+        }
+    }
+
+    </script>
+
+
+</body>
+</html>
