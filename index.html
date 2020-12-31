@@ -110,11 +110,12 @@
 
 
         function return_to_zone(){
-            if(parts[0][0] < 0) parts[0][0] = 30;
-            if(parts[0][0] > 29) parts[0][0] = 0;
 
-            if(parts[0][1] > 29) parts[0][1] = 0;
-            if(parts[0][1] < 0) parts[0][1] = 30;
+            if(parts[0][0] < -1) parts[0][0] = 29;
+            if(parts[0][0] > 30) parts[0][0] = -1;
+
+            if(parts[0][1] > 30) parts[0][1] = -1;
+            if(parts[0][1] < -1) parts[0][1] = 29;
         }
 
         function die(){
