@@ -15,6 +15,8 @@
             background: white;
             display: block;
             margin: 0 auto;
+
+            background-size: cover;
         }
 
 
@@ -26,18 +28,26 @@
 
     <canvas id="cav" width="750" height="750">
         Твой браузер говно!
+
     </canvas>
 
+    <input type="button" value="Restart" id="reload" onclick="Restart()">
     <input type="button" value="Start" id="start" onclick="StartGame()">
     <a href="https://www.youtube.com/watch?v=TdolE19kvTU">тык ми</a>
     <script>
 
+        $('#reload').hide();
+
+        function Restart(){
+            location.reload();
+        }
 
         function StartGame(){
 
             $("#start").remove();
             
             var audio = new Audio('406869f961.mp3');
+            audio.loop == true;
             audio.play();
         
 
@@ -59,10 +69,11 @@
             function sayHi() {
 
                 if(game_play){
-                    return_to_zone();
+                    //return_to_zone();
                     move();
                     die();
                     eat(parts[0][0], parts[0][1])
+                    draw_score();
                 }else{
 
                 }
@@ -108,14 +119,25 @@
         });
 
 
+        audio.addEventListener("ended",function(){
+            audio.play();
+        });
+
+
+        function draw_score(){
+            ctx.beginPath();
+            ctx.fillStyle = 'red';
+            ctx.font = "30px Arial";
+            ctx.fillText(parts.length - 1, 10, 50);
+        }
 
         function return_to_zone(){
 
-            if(parts[0][0] < -1) parts[0][0] = 29;
-            if(parts[0][0] > 30) parts[0][0] = -1;
+            if(parts[0][0] == -1) parts[0][0] = 30;
+            if(parts[0][0] == 31) parts[0][0] = -1;
 
-            if(parts[0][1] > 30) parts[0][1] = -1;
-            if(parts[0][1] < -1) parts[0][1] = 29;
+            if(parts[0][1] == 31) parts[0][1] = -1;
+            if(parts[0][1] == -1) parts[0][1] = 30;
         }
 
         function die(){
@@ -141,8 +163,11 @@
                         // background.src = "uyuktf.png'";
                         // ctx.drawImage(background,0,0);   
 
-                        $("canvas").css("background-image", "url('uyuktf.png')");
-
+                    
+                        //$("canvas").css("background-image", "url('uyuktf.png')");
+                        $("canvas").css("background-image", "url('https://i.pinimg.com/originals/af/c8/7b/afc87b53146aaeaf78eaad0bb50fd8a2.gif')");
+                        $('#reload').show();
+                        
                         //location.reload();
                         return;
                     }
@@ -201,19 +226,45 @@
             
                 if(i == 0){
 
+                    // if(parts[0][0] == -1) parts[0][0] = 30;
+                    // if(parts[0][0] == 31) parts[0][0] = -1;
+
+                    // if(parts[0][1] == 31) parts[0][1] = -1;
+                    // if(parts[0][1] == -1) parts[0][1] = 30;
+
                     if(element[2] == 'l'){
-                        element[0] += 1; 
+                        if(parts[0][0] >= 29){
+                            element[0] = 0; 
+                        } else{
+                           element[0] += 1;  
+                        }
+                        
                     }   
                     if(element[2] == 'd'){
-                        element[1] += 1; 
+                        if(parts[0][1] >= 29){
+                            element[1] = 0;
+                        }else{
+                            element[1] += 1; 
+                        }
+                        
                     } 
+
                     if(element[2] == 'u'){
-                        element[1] -= 1; 
+                        if(parts[0][1] <= 0){
+                            element[1] = 29;
+                        }else{
+                            element[1] -= 1; 
+                        }
                     } 
+
                     if(element[2] == 'r'){
+                        console.log(element[0]);
+                        if(element[0] < 1) {
+                            element[0] = 30; 
+                        }
                         element[0] -= 1; 
                     }
-                    
+
                 }else{
                     element = parts[i - 1];                  
                 }
